@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:util="http://www.springframework.org/schema/util" xmlns:context="http://www.springframework.org/schema/context" xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd     http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+				
+	<!-- The controllers are autodetected POJOs labeled with the @Controller annotation. -->
+	<context:component-scan base-package="fr.carnavello" use-default-filters="false">
+	</context:component-scan>
+	
+
+	
+	 
+	<bean id="adminUser" class="fr.carnavello.administration.commons.security.impl.UserImpl" p:login="adminUser"  >
+		<property name="roleDAO" ref="roleDAO" />
+	</bean>
+	<bean id="readerUser" class="fr.carnavello.administration.commons.security.impl.UserImpl" p:login="readerUser">
+		<property name="roleDAO" ref="roleDAO" />
+	</bean>
+	
+	
+	
+	<bean id="createUserPermission" class="fr.carnavello.administration.commons.security.impl.NonContextualPermissionImpl" p:id="createUser"/>
+	<bean id="deleteUserPermission" class="fr.carnavello.administration.commons.security.impl.NonContextualPermissionImpl" p:id="deleteUser"/>
+	<bean id="consultUserPermission" class="fr.carnavello.administration.commons.security.impl.NonContextualPermissionImpl" p:id="consultUser"/>
+	
+	
+	<bean id="adminRole" class="fr.carnavello.administration.commons.security.impl.RoleImpl" p:id="adminRole">
+		<property name="permissions">
+		<list>
+			<ref bean="createUserPermission"/>
+			<ref bean="deleteUserPermission"/>
+			<ref bean="consultUserPermission"/>
+		</list>
+	</property>
+	</bean>
+		
+	<bean id="readerRole" class="fr.carnavello.administration.commons.security.impl.RoleImpl" p:id="readerRole">
+		<property name="permissions">
+		<list>
+			<ref bean="consultUserPermission"/>
+		</list>
+	</property>
+	</bean>
+	
+	
+	
+	<bean id="userDAO" class="fr.carnavello.administration.commons.security.impl.dao.SpringUserDAO" >
+	    <property name="users">
+		<list>
+			<ref bean="adminUser"/>
+			<ref bean="readerUser"/>
+		</list>
+		</property>
+	</bean>
+	
+	
+	<util:list id="adminUserRoles">
+	<ref bean="adminRole"/>
+	</util:list>
+	
+	<util:list id="readerUserRoles">
+	<ref bean="readerRole"/>
+	</util:list>
+	
+	
+	<bean id="roleDAO" class="fr.carnavello.administration.commons.security.impl.dao.SpringRoleDAO" >
+	<property name="userRoles">
+		<map>
+			<entry>
+				<key><value>adminUser</value></key>
+			    <ref bean="adminUserRoles"/>
+			</entry>
+			<entry>
+				<key><value>readerUser</value></key>
+			    <ref bean="readerUserRoles"/>
+			</entry>
+		</map>
+	</property>
+	</bean>
+	
+	
+	    <bean id="contextApplicationContextProvider" class="fr.carnavello.administration.commons.spring.ApplicationContextProvider"/>  
+	    
+	
+ 	
+</beans>
